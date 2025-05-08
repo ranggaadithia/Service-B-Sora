@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-b-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-b-app
+  template:
+    metadata:
+      labels:
+        app: service-b-app
+    spec:
+      containers:
+        - name: service-b-app
+          image: ranggaadithia/service-b-app:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8001
+          env:
+            - name: DB_HOST
+              value: service-b-db
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_DATABASE
+              value: stock-db
+            - name: DB_USERNAME
+              value: postgres
+            - name: DB_PASSWORD
+              value: postgres
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              composer install && \
+              php artisan key:generate && \
+              php artisan migrate && \
+              php artisan serve --host=0.0.0.0 --port=8002
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-b-app
+spec:
+  selector:
+    app: service-b-app
+  ports:
+    - protocol: TCP
+      port: 8001
+      targetPort: 8001
+      nodePort: 30001
+  type: NodePort
+---
