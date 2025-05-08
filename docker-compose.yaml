@@ -1,0 +1,46 @@
+version: "3"
+networks:
+  application:
+    driver: bridge
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: service_b_project_sora
+    ports:
+      - "8001:8001"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=service_b_db
+      - DB_PORT=5432
+      - DB_DATABASE=service-b-db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    networks:
+      - application
+    entrypoint: /bin/sh
+    command: -c "composer install && php artisan key:generate && php artisan migrate && php artisan serve --host=0.0.0.0 --port=8001"
+
+  db:
+    image: postgres:15
+    container_name: service_b_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=service-b-db
+    networks:
+      - application
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
