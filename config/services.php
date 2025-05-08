@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    'service_a' => [
+        'base_url' => env('SERVICE_A_BASE_URL'),
+    ],
+
+    'service_c' => [
+        'base_url' => env('SERVICE_C_BASE_URL'),
+    ],
+
+
 ];

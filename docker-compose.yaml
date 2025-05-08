@@ -30,7 +30,7 @@ services:
     image: postgres:15
     container_name: service_b_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - ./data:/var/lib/postgresql/data
     environment:
