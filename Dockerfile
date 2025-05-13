@@ -1,7 +1,15 @@
 FROM php:8.3.10
 
 # Install dependencies
-RUN apt-get update -y && apt-get install -y openssl zip unzip git libpq-dev
+RUN apt-get update -y && apt-get install -y \
+    openssl \
+    zip \
+    unzip \
+    git \
+    libpq-dev \
+    libpcre3-dev \
+    && pecl install apcu \
+    && docker-php-ext-enable apcu
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -19,7 +27,7 @@ COPY . /app
 RUN composer install
 
 # Expose the Laravel dev server port
-EXPOSE 8002
+EXPOSE 8001
 
 # Default command to run Laravel
-CMD php artisan serve --host=0.0.0.0 --port=8002
+CMD php artisan serve --host=0.0.0.0 --port=8001
